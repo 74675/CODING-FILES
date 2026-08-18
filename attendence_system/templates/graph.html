@@ -1,0 +1,710 @@
+{% extends "base.html" %}
+
+{% block title %}
+Attendance Analytics | SRMU
+{% endblock %}
+
+{% block page_heading %}
+Attendance Analytics
+{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <div>
+        <span class="section-label">ANALYTICS</span>
+
+        <h2>Student Attendance Analytics</h2>
+
+        <p>
+            Select a student to view subject-wise attendance.
+        </p>
+    </div>
+
+    <div class="intro-icon purple-intro">
+        <i class="fa-solid fa-chart-column"></i>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     STUDENT SELECTOR
+========================================================= -->
+
+<div class="table-card analytics-selector">
+
+    <div class="table-top">
+
+        <div>
+            <h3>Select Student</h3>
+
+            <p>
+                View attendance subject-wise
+            </p>
+        </div>
+
+    </div>
+
+
+    <form method="GET" action="{{ url_for('graph') }}" class="analytics-form">
+
+        <div class="analytics-select-wrapper">
+
+            <i class="fa-solid fa-user-graduate"></i>
+
+            <select name="roll" id="studentSelect">
+
+                <option value="">
+                    -- Select Student --
+                </option>
+
+                {% for student in students %}
+
+                <option value="{{ student.roll }}" {% if selected_roll==student.roll %} selected {% endif %}>
+                    {{ student.name }} - {{ student.roll }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <button type="submit" class="primary-btn">
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            View Analytics
+
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- =========================================================
+     SELECTED STUDENT
+========================================================= -->
+
+{% if selected_student %}
+
+
+<!-- =========================================================
+     STATISTICS
+========================================================= -->
+
+<div class="stats-grid analytics-stats">
+
+
+    <!-- STUDENT -->
+
+    <div class="stat-card blue">
+
+        <div class="stat-icon">
+            <i class="fa-solid fa-user-graduate"></i>
+        </div>
+
+        <div class="stat-content">
+
+            <span>Student</span>
+
+            <h3>
+                {{ selected_student.name }}
+            </h3>
+
+            <small>
+                Roll No: {{ selected_student.roll }}
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUBJECTS -->
+
+    <div class="stat-card purple">
+
+        <div class="stat-icon">
+            <i class="fa-solid fa-book"></i>
+        </div>
+
+        <div class="stat-content">
+
+            <span>Total Subjects</span>
+
+            <h3>
+                {{ subject_data|length }}
+            </h3>
+
+            <small>
+                Subjects with attendance records
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- PRESENT -->
+
+    <div class="stat-card green">
+
+        <div class="stat-icon">
+            <i class="fa-solid fa-user-check"></i>
+        </div>
+
+        <div class="stat-content">
+
+            <span>Total Present</span>
+
+            <h3>
+                {{ subject_data|sum(attribute='present') }}
+            </h3>
+
+            <small>
+                Classes attended
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- OVERALL -->
+
+    <div class="stat-card orange">
+
+        <div class="stat-icon">
+            <i class="fa-solid fa-chart-pie"></i>
+        </div>
+
+        <div class="stat-content">
+
+            <span>Overall Attendance</span>
+
+            {% set total_classes =
+            subject_data|sum(attribute='total')
+            %}
+
+            {% set total_present =
+            subject_data|sum(attribute='present')
+            %}
+
+
+            <h3>
+
+                {% if total_classes > 0 %}
+
+                {{
+                (
+                (total_present / total_classes) * 100
+                ) | round(1)
+                }}%
+
+                {% else %}
+
+                0%
+
+                {% endif %}
+
+            </h3>
+
+
+            <small>
+                Overall attendance rate
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     CHART CARD
+========================================================= -->
+
+<div class="table-card graph-card">
+
+    <div class="table-top">
+
+        <div>
+
+            <h3>
+                Subject-wise Attendance
+            </h3>
+
+            <p>
+                Present vs absent classes
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if subject_data %}
+
+
+    <!-- CHART -->
+
+    <div class="chart-container" style="
+            position: relative;
+            width: 100%;
+            height: 360px;
+            min-height: 360px;
+        ">
+
+        <canvas id="attendanceChart"></canvas>
+
+    </div>
+
+
+    <!-- =====================================================
+         ATTENDANCE TABLE
+    ====================================================== -->
+
+    <div class="table-wrapper analytics-table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Subject
+                    </th>
+
+                    <th>
+                        Present
+                    </th>
+
+                    <th>
+                        Absent
+                    </th>
+
+                    <th>
+                        Total Classes
+                    </th>
+
+                    <th>
+                        Attendance %
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for item in subject_data %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ item.subject }}
+                        </strong>
+                    </td>
+
+
+                    <td>
+
+                        <span class="face-available">
+
+                            <i class="fa-solid fa-circle-check"></i>
+
+                            {{ item.present }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="face-missing">
+
+                            <i class="fa-solid fa-circle-xmark"></i>
+
+                            {{ item.absent }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+                        {{ item.total }}
+                    </td>
+
+
+                    <td>
+
+                        {% if item.percentage >= 75 %}
+
+                        <span class="status-badge present">
+
+                            <span></span>
+
+                            {{ item.percentage }}%
+
+                        </span>
+
+                        {% else %}
+
+                        <span class="status-badge absent">
+
+                            <span></span>
+
+                            {{ item.percentage }}%
+
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- NO DATA -->
+
+    <div class="empty-state">
+
+        <i class="fa-solid fa-chart-column"></i>
+
+        <p>
+            No attendance records found for this student.
+        </p>
+
+    </div>
+
+
+    {% endif %}
+
+</div>
+
+
+{% else %}
+
+
+<!-- =========================================================
+     NO STUDENT SELECTED
+========================================================= -->
+
+<div class="table-card analytics-empty">
+
+    <div class="empty-state">
+
+        <i class="fa-solid fa-chart-line"></i>
+
+        <h3>
+            Select a Student
+        </h3>
+
+        <p>
+            Choose a student from the dropdown above
+            to view subject-wise attendance analytics.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% endif %}
+
+
+<!-- =========================================================
+     CHART.JS
+========================================================= -->
+
+{% if selected_student and subject_data %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const canvas =
+            document.getElementById("attendanceChart");
+
+
+        if (!canvas) {
+
+            console.error(
+                "Attendance chart canvas not found."
+            );
+
+            return;
+        }
+
+
+        if (typeof Chart === "undefined") {
+
+            console.error(
+                "Chart.js could not be loaded."
+            );
+
+            return;
+        }
+
+
+        /*
+         * Convert Jinja data into valid JavaScript.
+         *
+         * IMPORTANT:
+         * tojson prevents invalid JS when subject names
+         * contain quotes or special characters.
+         */
+
+        const chartData =
+            {{ subject_data | tojson | safe
+    }};
+
+
+    if (
+        !Array.isArray(chartData) ||
+        chartData.length === 0
+    ) {
+
+        console.warn(
+            "No attendance data available."
+        );
+
+        return;
+    }
+
+
+    /*
+     * Prepare labels
+     */
+
+    const labels = chartData.map(function (item) {
+
+        return String(
+            item.subject || "Unknown Subject"
+        );
+
+    });
+
+
+    /*
+     * Present classes
+     */
+
+    const presentData = chartData.map(function (item) {
+
+        const value =
+            Number(item.present);
+
+        return Number.isFinite(value)
+            ? value
+            : 0;
+
+    });
+
+
+    /*
+     * Absent classes
+     */
+
+    const absentData = chartData.map(function (item) {
+
+        const value =
+            Number(item.absent);
+
+        return Number.isFinite(value)
+            ? value
+            : 0;
+
+    });
+
+
+    /*
+     * Destroy old chart if it exists
+     */
+
+    if (
+        window.srmuAttendanceChart &&
+        typeof window.srmuAttendanceChart.destroy === "function"
+    ) {
+
+        window.srmuAttendanceChart.destroy();
+
+    }
+
+
+    /*
+     * Create chart
+     */
+
+    window.srmuAttendanceChart =
+        new Chart(canvas, {
+
+            type: "bar",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+
+                        label: "Present",
+
+                        data: presentData,
+
+                        backgroundColor:
+                            "rgba(34, 197, 94, 0.85)",
+
+                        borderColor:
+                            "rgba(22, 163, 74, 1)",
+
+                        borderWidth: 1,
+
+                        borderRadius: 8,
+
+                        borderSkipped: false
+
+                    },
+
+                    {
+
+                        label: "Absent",
+
+                        data: absentData,
+
+                        backgroundColor:
+                            "rgba(239, 68, 68, 0.85)",
+
+                        borderColor:
+                            "rgba(220, 38, 38, 1)",
+
+                        borderWidth: 1,
+
+                        borderRadius: 8,
+
+                        borderSkipped: false
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                animation: {
+
+                    duration: 500
+
+                },
+
+
+                interaction: {
+
+                    mode: "index",
+
+                    intersect: false
+
+                },
+
+
+                plugins: {
+
+                    legend: {
+
+                        display: true,
+
+                        position: "top"
+
+                    },
+
+
+                    tooltip: {
+
+                        enabled: true
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            precision: 0,
+
+                            stepSize: 1
+
+                        },
+
+                        title: {
+
+                            display: true,
+
+                            text: "Number of Classes"
+
+                        }
+
+                    },
+
+
+                    x: {
+
+                        title: {
+
+                            display: true,
+
+                            text: "Subjects"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+});
+
+</script>
+
+{% endif %}
+
+
+{% endblock %}

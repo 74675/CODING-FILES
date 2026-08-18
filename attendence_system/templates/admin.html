@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | SRMU Attendance
+{% endblock %}
+
+{% block page_heading %}
+Dashboard
+{% endblock %}
+
+
+{% block content %}
+
+<div class="welcome-section">
+
+    <div>
+
+        <span class="section-label">
+            OVERVIEW
+        </span>
+
+        <h2>
+            Good Afternoon, {{ user.name if user else "Admin" }} 👋
+        </h2>
+
+        <p>
+            Here's what's happening with attendance today.
+        </p>
+
+    </div>
+
+    <a href="{{ url_for('add_user') }}" class="primary-btn">
+
+        <i class="fa-solid fa-plus"></i>
+
+        Add New User
+
+    </a>
+
+</div>
+
+
+<!-- STATISTICS -->
+
+<div class="stats-grid">
+
+    <div class="stat-card blue">
+
+        <div class="stat-icon">
+            <i class="fa-solid fa-user-graduate"></i>
+        </div>
+
+        <div class="stat-content">
+
+            <span>Total Students</span>
+
+            <h3>
+                {{ total_students }}
+            </h3>
+
+            <small>
+                <i class="fa-solid fa-arrow-up"></i>
+                Registered students
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-card purple">
+
+        <div class="stat-icon">
+            <i class="fa-solid fa-chalkboard-user"></i>
+        </div>
+
+        <div class="stat-content">
+
+            <span>Total Teachers</span>
+
+            <h3>
+                {{ total_teachers }}
+            </h3>
+
+            <small>
+                <i class="fa-solid fa-users"></i>
+                Faculty members
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-card green">
+
+        <div class="stat-icon">
+            <i class="fa-solid fa-user-check"></i>
+        </div>
+
+        <div class="stat-content">
+
+            <span>Present Today</span>
+
+            <h3>
+                {{ today_present }}
+            </h3>
+
+            <small>
+                <i class="fa-solid fa-circle-check"></i>
+                Attendance marked
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-card orange">
+
+        <div class="stat-icon">
+            <i class="fa-solid fa-chart-line"></i>
+        </div>
+
+        <div class="stat-content">
+
+            <span>Today's Rate</span>
+
+            <h3>
+                {{ attendance_percentage }}%
+            </h3>
+
+            <small>
+                <i class="fa-solid fa-calendar-day"></i>
+                Today's attendance
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- QUICK ACTIONS -->
+
+<div class="section-heading">
+
+    <div>
+
+        <h3>
+            Quick Actions
+        </h3>
+
+        <p>
+            Manage attendance easily
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="quick-actions">
+
+    <a href="{{ url_for('attendance') }}" class="action-card">
+
+        <div class="action-icon blue-icon">
+            <i class="fa-solid fa-clipboard-check"></i>
+        </div>
+
+        <div>
+
+            <h4>
+                Manual Attendance
+            </h4>
+
+            <p>
+                Mark attendance by roll number
+            </p>
+
+        </div>
+
+        <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+    </a>
+
+
+    <a href="{{ url_for('face_attendance') }}" class="action-card">
+
+        <div class="action-icon cyan-icon">
+            <i class="fa-solid fa-camera"></i>
+        </div>
+
+        <div>
+
+            <h4>
+                Face Scanner
+            </h4>
+
+            <p>
+                Use face recognition attendance
+            </p>
+
+        </div>
+
+        <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+    </a>
+
+
+    <a href="{{ url_for('graph') }}" class="action-card">
+
+        <div class="action-icon purple-icon">
+            <i class="fa-solid fa-chart-column"></i>
+        </div>
+
+        <div>
+
+            <h4>
+                Attendance Analytics
+            </h4>
+
+            <p>
+                View attendance statistics
+            </p>
+
+        </div>
+
+        <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+    </a>
+
+</div>
+
+
+<!-- RECENT ATTENDANCE -->
+
+<div class="section-heading recent-heading">
+
+    <div>
+
+        <h3>
+            Recent Attendance
+        </h3>
+
+        <p>
+            Latest attendance records
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="table-card">
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Person
+                    </th>
+
+                    <th>
+                        Roll No.
+                    </th>
+
+                    <th>
+                        Role
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Method
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% if recent_attendance %}
+
+                {% for record in recent_attendance %}
+
+                <tr>
+
+                    <td>
+
+                        <div class="person-cell">
+
+                            <div class="table-avatar">
+
+                                <i class="fa-solid fa-user"></i>
+
+                            </div>
+
+                            <strong>
+                                {{ record.name }}
+                            </strong>
+
+                        </div>
+
+                    </td>
+
+                    <td>
+                        {{ record.roll }}
+                    </td>
+
+                    <td>
+
+                        <span class="role-badge">
+                            {{ record.role|title }}
+                        </span>
+
+                    </td>
+
+                    <td>
+                        {{ record.date }}
+                    </td>
+
+                    <td>
+                        {{ record.time or "--" }}
+                    </td>
+
+                    <td>
+
+                        <span class="method-badge">
+
+                            {% if record.method == "Face Recognition" %}
+
+                            <i class="fa-solid fa-face-smile"></i>
+                            Face
+
+                            {% else %}
+
+                            <i class="fa-solid fa-pen"></i>
+                            Manual
+
+                            {% endif %}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <span class="status-badge present">
+
+                            <span></span>
+
+                            Present
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="7" class="empty-state">
+
+                        <i class="fa-solid fa-inbox"></i>
+
+                        <p>
+                            No attendance records yet.
+                        </p>
+
+                    </td>
+
+                </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

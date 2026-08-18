@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}
+Face Scanner | SRMU
+{% endblock %}
+
+{% block page_heading %}
+Face Recognition
+{% endblock %}
+
+
+{% block content %}
+
+<div class="face-page">
+
+    <div class="page-intro">
+
+        <div>
+
+            <span class="section-label">
+                AI ATTENDANCE
+            </span>
+
+            <h2>
+                Face Recognition Scanner
+            </h2>
+
+            <p>
+                Automatically identify registered users and mark attendance.
+            </p>
+
+        </div>
+
+        <div class="intro-icon cyan-intro">
+            <i class="fa-solid fa-face-smile"></i>
+        </div>
+
+    </div>
+
+
+    {% if success_name %}
+
+    <div class="result-card success-result">
+
+        <div class="result-icon">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <div>
+
+            <span>
+                ATTENDANCE MARKED
+            </span>
+
+            <h3>
+                {{ success_name }}
+            </h3>
+
+            <p>
+                Roll Number: {{ success_roll }}
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if already_name %}
+
+    <div class="result-card warning-result">
+
+        <div class="result-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <div>
+
+            <span>
+                ALREADY MARKED
+            </span>
+
+            <h3>
+                {{ already_name }}
+            </h3>
+
+            <p>
+                Attendance for {{ already_roll }} has already been marked today.
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if no_match %}
+
+    <div class="result-card danger-result">
+
+        <div class="result-icon">
+            <i class="fa-solid fa-user-slash"></i>
+        </div>
+
+        <div>
+
+            <span>
+                SCAN COMPLETE
+            </span>
+
+            <h3>
+                No Match Found
+            </h3>
+
+            <p>
+                No registered face was detected.
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <div class="scanner-layout">
+
+        <div class="scanner-card">
+
+            <div class="scanner-visual">
+
+                <div class="scanner-corner top-left"></div>
+                <div class="scanner-corner top-right"></div>
+                <div class="scanner-corner bottom-left"></div>
+                <div class="scanner-corner bottom-right"></div>
+
+                <div class="scanner-face">
+
+                    <i class="fa-solid fa-face-smile"></i>
+
+                </div>
+
+                <div class="scanner-line"></div>
+
+                <div class="scanner-text">
+
+                    <i class="fa-solid fa-camera"></i>
+
+                    Camera Scanner Ready
+
+                </div>
+
+            </div>
+
+
+            <div class="scanner-content">
+
+                <h3>
+                    Ready to Scan
+                </h3>
+
+                <p>
+                    Click the button below to open your webcam.
+                    Make sure the face is clearly visible.
+                </p>
+
+                <a href="{{ url_for('start_camera') }}" class="primary-btn scanner-btn">
+
+                    <i class="fa-solid fa-camera"></i>
+
+                    Start Face Scanner
+
+                </a>
+
+                <span class="scanner-hint">
+                    Press <strong>Q</strong> to stop the camera.
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="instructions-card">
+
+            <div class="instructions-header">
+
+                <div class="info-icon cyan">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+
+                <div>
+
+                    <h3>
+                        How It Works
+                    </h3>
+
+                    <p>
+                        Simple 3-step process
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <div>
+
+                    <h4>
+                        Start Scanner
+                    </h4>
+
+                    <p>
+                        Allow the application to access your webcam.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <div>
+
+                    <h4>
+                        Face Detection
+                    </h4>
+
+                    <p>
+                        The system compares the detected face with
+                        registered profiles.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <div>
+
+                    <h4>
+                        Attendance Marked
+                    </h4>
+
+                    <p>
+                        Matching users are automatically marked present.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
